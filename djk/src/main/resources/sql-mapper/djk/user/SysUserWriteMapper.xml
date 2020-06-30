@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.user.SysUserWriteDao">
+	<resultMap id="SysUserResult" type="com.djk.web.entity.user.SysUser">
+			<result property="id" column="id" />
+			<result property="name" column="name" />
+			<result property="userName" column="user_name" />
+			<result property="pwd" column="pwd" />
+			<result property="roleId" column="role_id" />
+			<result property="operateTime" column="operate_time" />
+	</resultMap>
+	
+	<select id="get" parameterType="Integer" resultMap="SysUserResult">
+		select
+		   *
+		from `sys_user`
+		where `id` = #{id}
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.user.SysUser">
+        update `sys_user` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="name != null">`name`= #{name},</if>
+			<if test="userName != null">`user_name`= #{userName},</if>
+			<if test="pwd != null">`pwd`= #{pwd},</if>
+			<if test="roleId != null">`role_id`= #{roleId},</if>
+			`operate_time`= now()
+	    </set>
+        where `id` = #{id}
+	</update>
+	<update id="updatePassword" parameterType="com.djk.web.entity.user.SysUser">
+	 update `sys_user` 
+    	<set>
+		
+			<if test="pwd != null">`pwd`= #{pwd},</if>
+		
+			`operate_time`= now()
+	    </set>
+        where `id` = #{id}
+	 </update>
+	<insert id="insert" parameterType="com.djk.web.entity.user.SysUser" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`sys_user`
+		(
+			
+			`name`,
+			`user_name`,
+			`pwd`,
+			`role_id`,
+			`operate_time`
+		)
+		values
+		(
+			#{name},
+			#{userName},
+			#{pwd},
+			#{roleId},
+			now()
+		)
+	</insert>
+	<select id="page" parameterType="Integer" resultMap="SysUserResult">
+		SELECT * from sys_user
+		<include refid="whereConditions"/>
+		<if test="size != null and size &gt; 0">limit #{start},#{size}</if>
+	</select>
+	<select id="count" resultType="Integer"> 
+		select count(*) from `sys_user`
+		<include refid="whereConditions"/>
+	</select>
+	<delete id="del" parameterType="Integer" >
+		delete from  
+	    `sys_user`
+	    where id= #{id} 
+	</delete>
+	<sql id="whereConditions">
+        <where>
+            1=1
+            <if test="queryMap.q_name != null and queryMap.q_name != ''">
+                and `name` like CONCAT('%',#{queryMap.q_name},'%')
+            </if>
+        </where>
+    </sql>
+    <select id="validHasUser" resultType="Integer"> 
+		select count(*) from `sys_user`  u where u.user_name = #{userName}
+	</select>
+	<select id="getSysUserByUserName" parameterType="String" resultMap="SysUserResult">
+		select
+		   *
+		from `sys_user`
+		where `user_name` = #{userName}
+	</select>
+	<insert id="insertSysUserRole" parameterType="map">
+		insert into sys_user_role
+		(
+			user_id,
+			role_id
+		)values
+		(
+			#{userId},
+			#{roleId}
+		)
+	</insert>
+	<delete id="deleteSysUserRoleByUserId" parameterType="java.lang.Integer">
+		delete from sys_user_role
+		where user_id = #{userId}
+	</delete>
+	<select id="selectSysUserRoleByUserId" parameterType="java.lang.Integer" resultType="java.util.Map">
+		select 
+			* 
+		from sys_user_role
+		where user_id = #{userId}
+	</select>
+</mapper>

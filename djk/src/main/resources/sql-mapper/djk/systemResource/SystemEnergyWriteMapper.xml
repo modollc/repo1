@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.systemResource.SystemEnergyWriteDao">
+	<resultMap id="SystemEnergyResult" type="com.djk.web.entity.systemResource.SystemEnergy">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="energyName" column="energy_name" />
+			<result property="energyNum" column="energy_num" />
+			<result property="energyValue" column="energy_value" />
+			<result property="delFlag" column="del_flag" />
+	</resultMap>
+	<sql id="whereConditions">
+        <where>
+            1=1
+            <if test="energyName != null and energyName != ''">
+                and 
+                (`energy_name` like CONCAT('%',#{energyName},'%') or `energy_num` like CONCAT('%',#{energyName},'%') or  `energy_value` like CONCAT('%',#{energyName},'%') or  `id` like CONCAT('%',#{energyName},'%') )
+            </if>
+            and `del_flag` = 1
+        </where>
+    </sql>
+	<select id="get" parameterType="Integer" resultMap="SystemEnergyResult">
+		select
+		   *
+		from `system_energy`
+		where `id` = #{id}
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.systemResource.SystemEnergy">
+        update `system_energy` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="energyName != null">`energy_name`= #{energyName},</if>
+			<if test="energyNum != null">`energy_num`= #{energyNum},</if>
+			<if test="energyValue != null">`energy_value`= #{energyValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.systemResource.SystemEnergy" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`system_energy`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`energy_name`,
+			`energy_num`,
+			`energy_value`,
+			`del_flag`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			#{energyName},
+			#{energyNum},
+			#{energyValue},
+			1
+		)
+	</insert>
+	<select id="count" resultType="Integer">
+		select count(*) from `system_energy`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.systemResource.SystemEnergy" resultMap="SystemEnergyResult">
+		SELECT * from system_energy
+		<include refid="whereConditions" />
+	</select>
+  
+     <!-- 逻辑删除 -->
+    <update id="delete" parameterType="Integer">
+        update `system_energy` 
+        set `del_flag` = 2 where `id` = #{id}
+	</update>
+    <select id="checkNameUnique" parameterType="String" resultMap="SystemEnergyResult">
+		select
+		   *
+		from `system_energy`
+		where `energy_name` = #{energyName} and `del_flag` = 1
+	</select>
+</mapper>

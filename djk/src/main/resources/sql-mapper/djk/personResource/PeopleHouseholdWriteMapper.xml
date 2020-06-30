@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.personResource.PeopleHouseholdWriteDao">
+	<resultMap id="PeopleHouseholdResult" type="com.djk.web.entity.personResource.PeopleHousehold">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="household" column="household" />
+			<result property="householdValue" column="household_value" />
+			<result property="delFlag" column="del_flag" />
+	</resultMap>
+	<sql id="whereConditions">
+        <where>
+            1=1
+            <if test="household != null and household != ''">
+                and 
+                (`household` like CONCAT('%',#{household},'%') or `household_value` like CONCAT('%',#{household},'%') or `id` like CONCAT('%',#{household},'%') )
+            </if>
+            and `del_flag` = 1
+        </where>
+    </sql>
+	<select id="get" parameterType="Integer" resultMap="PeopleHouseholdResult">
+		select
+		   *
+		from `people_household`
+		where `id` = #{id}
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.personResource.PeopleHousehold">
+        update `people_household` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="household != null">`household`= #{household},</if>
+			<if test="householdValue != null">`household_value`= #{householdValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.personResource.PeopleHousehold" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`people_household`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`household`,
+			`household_value`,
+			`del_flag`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			#{household},
+			#{householdValue},
+			1
+		)
+	</insert>
+	<select id="count" resultType="Integer">
+		select count(*) from `people_household`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.personResource.PeopleHousehold" resultMap="PeopleHouseholdResult">
+		SELECT * from people_household
+		<include refid="whereConditions" />
+	</select>
+   
+    <!-- 逻辑删除 -->
+    <update id="delete" parameterType="Integer">
+        update `people_household` 
+        set `del_flag` = 2 where `id` = #{id}
+	</update>
+    <select id="checkNameUnique" parameterType="String" resultMap="PeopleHouseholdResult">
+		select
+		   *
+		from `people_household`
+		where `household` = #{household} and `del_flag` = 1
+	</select>
+	
+</mapper>

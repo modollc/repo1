@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.nutrition.NutritionCategoryWriteDao">
+	<resultMap id="NutritionCategoryResult"
+		type="com.djk.web.entity.nutrition.NutritionCategory">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="alias" column="alias" />
+		<result property="createBy" column="create_by" />
+		<result property="createDate" column="create_date" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateDate" column="update_date" />
+		<result property="code" column="code" />
+		<result property="state" column="state" />
+		<result property="pid" column="pid" />
+		<result property="pids" column="pids" />
+	</resultMap>
+
+    <select  id="checkDelete" resultType="Integer">
+	 select count(*) from nutrition_component 
+     where nutrition_category_id=#{cid} 
+     and state=1
+	</select>
+
+	<!-- 查询所有子孙栏目以及包括自己 -->
+	<select id="selectChildrenByParent" parameterType="Integer"
+		resultMap="CategroryMapper">
+		select * from
+		nutrition_category where pid = #{pid}
+	</select>
+	<resultMap type="com.djk.web.entity.nutrition.NutritionCategory"
+		id="CategroryMapper">
+		<id column="id" property="id"></id>
+		<result property="name" column="name" />
+		<result property="alias" column="alias" />
+		<result property="createBy" column="create_by" />
+		<result property="createDate" column="create_date" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateDate" column="update_date" />
+		<result property="code" column="code" />
+		<result property="state" column="state" />
+		<result property="pid" column="pid" />
+		<result property="pids" column="pids" />
+		<collection property="list" ofType="com.djk.web.entity.nutrition.NutritionCategory"
+			select="selectChildrenByParent" column="id" />
+	</resultMap>
+	<select id="selectChildrenById" parameterType="Integer"
+		resultMap="CategroryMapper">
+		select * from
+		nutrition_category
+		where id = #{id}
+	</select>
+
+
+
+
+
+
+
+
+	<select id="getCategory" parameterType="com.djk.web.entity.nutrition.NutritionCategory"
+		resultMap="NutritionCategoryResult">
+		select
+		*
+		from `nutrition_category` where pid=#{pid} and name=#{name}
+	</select>
+	<select id="get" parameterType="Integer" resultMap="NutritionCategoryResult">
+		select
+		*
+		from `nutrition_category` where id=#{id}
+	</select>
+
+	<select id="count" resultType="Integer">
+		select count(*) from `nutrition_category`
+		<include refid="whereConditions" />
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.nutrition.NutritionCategory"
+		resultMap="NutritionCategoryResult">
+		SELECT * from nutrition_category
+		<include refid="whereConditions" />
+	</select>
+	<sql id="whereConditions">
+		<where>
+			1=1
+			<if test="name != null and name != ''">
+				and `name` like CONCAT('%',#{name},'%')
+			</if>
+
+		</where>
+	</sql>
+	<delete id="delete" parameterType="String">
+		delete from `nutrition_category`
+		where `id` = #{id}
+	</delete>
+
+
+
+
+	<update id="update" parameterType="com.djk.web.entity.nutrition.NutritionCategory">
+		update `nutrition_category`
+		<set>
+
+
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="state != null">`state`= #{state},</if>
+
+			<if test="name != null">`name`= #{name}</if>
+
+
+		</set>
+		where `id` = #{id}
+	</update>
+	<update id="uppids" parameterType="com.djk.web.entity.nutrition.NutritionCategory">
+		update `nutrition_category`
+		<set>
+
+			<if test="pids != null">`pids`= #{pids}</if>
+
+
+		</set>
+		where `id` = #{id}
+	</update>
+
+	<insert id="insert" parameterType="com.djk.web.entity.nutrition.NutritionCategory"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into
+		`nutrition_category`
+		(
+
+		`create_by`,
+		`create_date`,
+		`update_by`,
+		`update_date`,
+		`remarks`,
+		`state`,
+		`name`,
+		`alias`,
+		`code`,
+		`pid`
+		)
+		values
+		(
+
+		#{createBy},
+		#{createDate},
+		#{updateBy},
+		#{updateDate},
+		#{remarks},
+		#{state},
+		#{name},
+		#{alias},
+		#{code},
+		#{pid}
+		)
+	</insert>
+
+
+	<select id="isSubNodeById" parameterType="Integer" resultType="Integer">
+		select
+		count(*)
+		from `nutrition_category`
+		where `pid` = #{pid} and`state` = 1
+	</select>
+
+	<select id="getCategoryListByPId" parameterType="Integer"
+		resultMap="NutritionCategoryResult">
+		select
+		*
+		from `nutrition_category`
+		where `pid` = #{pid} and `state` = 1
+	</select>
+
+	<select id="getCategoryListById" parameterType="Integer"
+		resultMap="NutritionCategoryResult">
+		select
+		*
+		from `nutrition_category`
+		where (`pids` like CONCAT('%',#{id},'%') or
+		`id`=#{id}) and `state` = 1
+	</select>
+
+</mapper>

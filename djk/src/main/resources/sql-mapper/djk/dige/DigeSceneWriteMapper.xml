@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.dige.DigeSceneWriteDao">
+	<resultMap id="DigeSceneResult" type="com.djk.web.entity.dige.DigeScene">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="delFlag" column="del_flag" />
+			<result property="sceneName" column="scene_name" />
+			<result property="reference" column="reference" />
+			<result property="sceneValue" column="scene_value" />
+	</resultMap>
+	
+	
+	<select id="count" resultType="Integer">
+		select count(*) from `dige_scene`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.dige.DigeScene" resultMap="DigeSceneResult">
+		SELECT * from dige_scene
+		<include refid="whereConditions" />
+	</select>
+   <sql id="whereConditions">
+        <where>
+            del_flag=1
+            <if test="sceneName != null and sceneName != ''">
+                and 
+                (`scene_name` like CONCAT('%',#{sceneName},'%') or `reference` like CONCAT('%',#{sceneName},'%') or  `scene_value` like CONCAT('%',#{sceneName},'%')  or  `id` like CONCAT('%',#{sceneName},'%'))
+            </if>
+        </where>
+    </sql>
+	<!--  <delete id="delete" parameterType="String">
+    delete from `dige_scene`
+		where `id` = #{id}
+    </delete> -->
+	<update id="delete" parameterType="String">
+	  update `dige_scene` set del_flag=2
+		where `id` = #{id}
+	</update>
+	
+	<select id="get" parameterType="Integer" resultMap="DigeSceneResult">
+		select
+		   *
+		from `dige_scene`
+		where `id` = #{id}
+	</select>
+	
+	
+	
+	<select id="checkNameUnique" parameterType="String" resultMap="DigeSceneResult">
+		select
+		   *
+		from `dige_scene`
+		where `scene_name` = #{sceneName} and del_flag=1
+	</select>
+	
+	
+	<update id="update" parameterType="com.djk.web.entity.dige.DigeScene">
+        update `dige_scene` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="sceneName != null">`scene_name`= #{sceneName},</if>
+			<if test="reference != null">`reference`= #{reference},</if>
+			<if test="sceneValue != null">`scene_value`= #{sceneValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.dige.DigeScene" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`dige_scene`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`del_flag`,
+			`scene_name`,
+			`reference`,
+			`scene_value`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			1,
+			#{sceneName},
+			#{reference},
+			#{sceneValue}
+		)
+	</insert>
+	
+</mapper>

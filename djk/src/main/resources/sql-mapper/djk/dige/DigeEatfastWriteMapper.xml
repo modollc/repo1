@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.dige.DigeEatfastWriteDao">
+	<resultMap id="DigeEatfastResult" type="com.djk.web.entity.dige.DigeEatfast">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="delFlag" column="del_flag" />
+			<result property="eatFast" column="eat_fast" />
+			<result property="eatTime" column="eat_time" />
+			<result property="eatValue" column="eat_value" />
+	</resultMap>
+	<select id="count" resultType="Integer">
+		select count(*) from `dige_eatfast`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.dige.DigeEatfast" resultMap="DigeEatfastResult">
+		SELECT * from dige_eatfast
+		<include refid="whereConditions" />
+	</select>
+   <sql id="whereConditions">
+        <where>
+            del_flag=1
+            <if test="eatFast != null and eatFast != ''">
+                and  
+                (`eat_fast` like CONCAT('%',#{eatFast},'%')  or `eat_time` like CONCAT('%',#{eatFast},'%')  or `eat_value` like CONCAT('%',#{eatFast},'%') or `id` like CONCAT('%',#{eatFast},'%') )
+            </if>
+        </where>
+    </sql>
+	<!--  <delete id="delete" parameterType="String">
+    delete from `dige_eatfast`
+		where `id` = #{id}
+    </delete> -->
+    <update id="delete" parameterType="String">
+    update `dige_eatfast` set del_flag=2
+		where `id` = #{id}
+    </update>
+	<select id="get" parameterType="Integer" resultMap="DigeEatfastResult">
+		select
+		   *
+		from `dige_eatfast`
+		where `id` = #{id}
+	</select>
+	<select id="checkNameUnique" parameterType="String" resultMap="DigeEatfastResult">
+		select
+		   *
+		from `dige_eatfast`
+		where `eat_fast` = #{eatFast} and del_flag=1
+	</select>
+	<update id="update" parameterType="com.djk.web.entity.dige.DigeEatfast">
+        update `dige_eatfast` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="eatFast != null">`eat_fast`= #{eatFast},</if>
+			<if test="eatTime != null">`eat_time`= #{eatTime},</if>
+			<if test="eatValue != null">`eat_value`= #{eatValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.dige.DigeEatfast" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`dige_eatfast`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`del_flag`,
+			`eat_fast`,
+			`eat_time`,
+			`eat_value`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			1,
+			#{eatFast},
+			#{eatTime},
+			#{eatValue}
+		)
+	</insert>
+	
+</mapper>

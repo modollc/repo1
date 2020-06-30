@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.personResource.PeopleMovementWriteDao">
+	<resultMap id="PeopleMovementResult" type="com.djk.web.entity.personResource.PeopleMovement">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="movementName" column="movement_name" />
+			<result property="movementTime" column="movement_time" />
+			<result property="movementNum" column="movement_num" />
+			<result property="delFlag" column="del_flag" />
+	</resultMap>
+	<sql id="whereConditions">
+        <where>
+            1=1
+            <if test="movementName != null and movementName != ''">
+                and 
+                (`movement_name` like CONCAT('%',#{movementName},'%') or `movement_time` like CONCAT('%',#{movementName},'%') or `movement_num` like CONCAT('%',#{movementName},'%')  or `id` like CONCAT('%',#{movementName},'%') )
+            </if>
+            and `del_flag` = 1
+        </where>
+    </sql>
+	<select id="get" parameterType="Integer" resultMap="PeopleMovementResult">
+		select
+		   *
+		from `people_movement`
+		where `id` = #{id}
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.personResource.PeopleMovement">
+        update `people_movement` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="movementName != null">`movement_name`= #{movementName},</if>
+			<if test="movementTime != null">`movement_time`= #{movementTime},</if>
+			<if test="movementNum != null">`movement_num`= #{movementNum}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.personResource.PeopleMovement" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`people_movement`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`movement_name`,
+			`movement_time`,
+			`movement_num`,
+			`del_flag`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			#{movementName},
+			#{movementTime},
+			#{movementNum},
+			1
+		)
+	</insert>
+	<select id="count" resultType="Integer">
+		select count(*) from `people_movement`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.personResource.PeopleMovement" resultMap="PeopleMovementResult">
+		SELECT * from people_movement
+		<include refid="whereConditions" />
+	</select>
+ 
+    <!-- 逻辑删除 -->
+    <update id="delete" parameterType="Integer">
+        update `people_movement` 
+        set `del_flag` = 2 where `id` = #{id}
+	</update>
+    <select id="checkNameUnique" parameterType="String" resultMap="PeopleMovementResult">
+		select
+		   *
+		from `people_movement`
+		where `movement_name` = #{movementName} and `del_flag` = 1
+	</select>
+</mapper>

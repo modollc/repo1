@@ -1,0 +1,40 @@
+@charset "utf-8";
+/* CSS Document */
+.col-lg-2{padding:0;margin:0;}
+.col-lg-10{padding:0;margin:0;}
+.tree{border-right:1px solid #f0f0f0;}
+.tree a{color:#231815;display:block;text-decoration:none;}
+.tree .now{border-left:5px solid #0090cd;color:#0090cd;}
+.tree .now a{color:#0090cd;}
+.tree ul:first-child{margin:0;padding:0;text-indent:20px;font-size:12px;}
+.tree ul li{list-style-type:none;margin:0;padding:0;}
+.tree ul{margin:0;padding:0;text-indent:50px;font-size:12px;}
+.tree li span{height:45px;line-height:45px;border-bottom:1px solid #f0f0f0;display:block;cursor:pointer;position:relative;}
+.tree li span em{display:inline-block;width:8px;height:8px;line-height:8px;margin-right:5px;border-radius:100px;vertical-align:middle;font-size:12px;background-color:#74c0dd;}
+.tree li span i{height:20px;line-height:20px;position:absolute;top:12px;right:10px;color:#74c0dd;font-size:12px;}
+.tree li span:hover{background-color:#74c0dd;display:block;color:#fff;}
+.tree li span:hover i{color:#fff;}
+.tree li span:hover a{color:#fff;}
+.tree li span:hover em{background-color:#fff;}
+
+.logininfo{position:absolute;right:0;top:83px;height:35px;line-height:35px;font-size:12px;}
+.logininfo time{font-size:xx-small;color:#999;}
+.logininfo a{font-size:14px;padding:0 10px;margin:0 5px;height:35px;line-height:35px;display:inline-block;text-decoration:none;}
+.logininfo a:hover{background-color:#0090cd;color:#fff;}
+
+.nav-tabs{border-bottom: 1px solid #0090cd;}
+.nav-tabs > li > a {border-radius:0;}
+.nav-tabs > li > a:hover {background-color:#fff;border:1px solid #fff;border-bottom:1px solid #0090cd;}
+
+.nav-tabs > li.active > a,.nav-tabs > li.active > a:hover,.nav-tabs > li.active > a:focus{color:#fff;background-color:#0090cd;border:0px solid #ddd;border-bottom:1px solid #0090cd;}
+
+/*右下角弹窗样式*/
+.tips{position:fixed;z-index:10;bottom:-185px;right:5px;width:280px;border:1px solid #0090cd;box-shadow:3px 3px 0px rgba(0,0,0,0.1);}
+.tips .title{position:relative;height:25px;line-height:25px;text-indent:10px;background-color:#0090cd;font-size:12px;color:#fff;}
+.tips .title .close{position:absolute;top:0;right:0;width:25px;height:25px;line-height:25px;color:#fff;font-size:12px;opacity:1;}
+.tips .message{background-color:#fff;min-height:30px;max-height:100px;line-height:1.8em;padding:5px 10px;font-size:14px;overflow:inherit;overflow-y:auto;}
+.tips .button{text-align:center;padding:5px 0 10px 0;background-color:#fff;}
+.tips .button a{display:inline-block;text-decoration:none;min-width:80px;min-width:100px;height:30px;line-height:30px;font-size:14px;background-color:#f55821;color:#fff;margin:0 auto;padding:0 10px;}
+
+
+.iframe{width:100%;margin:0;padding:0;border:0px;overflow:hidden;overflow-y:scroll;}

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.food.FoodPhyStateWriteDao">
+	<resultMap id="FoodPhyStateResult" type="com.djk.web.entity.food.FoodPhyState">
+		<result property="id" column="id" />
+		<result property="createBy" column="create_by" />
+		<result property="createDate" column="create_date" />
+		<result property="updateBy" column="update_by" />
+		<result property="updateDate" column="update_date" />
+		<result property="remarks" column="remarks" />
+		<result property="delFlag" column="del_flag" />
+		<result property="foodStatus" column="food_status" />
+		<result property="foodValue" column="food_value" />
+	</resultMap>
+
+	<select id="page" parameterType="Integer" resultMap="FoodPhyStateResult">
+		SELECT * from food_phy_state
+		<include refid="whereConditions" />
+		
+	</select>
+	<select id="count" resultType="Integer">
+		select count(*) from `food_phy_state`
+		 <include refid="whereConditions" /> 
+	</select>
+
+   <!-- 查询岗位列表页 -->
+	<select id="findList" parameterType="com.djk.web.entity.food.FoodPhyState" resultMap="FoodPhyStateResult">
+		SELECT * from food_phy_state
+		<include refid="whereConditions" />
+	</select>
+   <sql id="whereConditions">
+        <where>
+            del_flag=1
+            <if test="foodStatus != null and foodStatus != ''">
+                and 
+                (`food_status` like CONCAT('%',#{foodStatus},'%') or `food_value` like CONCAT('%',#{foodStatus},'%') or  `id` like CONCAT('%',#{foodStatus},'%') )
+            </if>
+        </where>
+    </sql>
+
+	<select id="get" parameterType="Integer" resultMap="FoodPhyStateResult">
+		select
+		*
+		from `food_phy_state`
+		where `id` = #{id}
+	</select>
+	<select id="checkNameUnique" parameterType="String" resultMap="FoodPhyStateResult">
+		select
+		   *
+		from `food_phy_state`
+		where `food_status` = #{foodStatus} and  del_flag=1
+	</select>
+    <!-- <delete id="delete" parameterType="String">
+    delete from `food_phy_state`
+		where `id` = #{id}
+    </delete> -->
+    <update id="delete" parameterType="String">
+      update `food_phy_state` set del_flag=2
+		where `id` = #{id}
+    </update>
+
+	<update id="update" parameterType="com.djk.web.entity.food.FoodPhyState">
+		update `food_phy_state`
+		<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="foodStatus != null">`food_status`= #{foodStatus},</if>
+			<if test="foodValue != null">`food_value`= #{foodValue}</if>
+		</set>
+		where `id` = #{id}
+	</update>
+
+	<insert id="insert" parameterType="com.djk.web.entity.food.FoodPhyState"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into
+		`food_phy_state`
+		(
+
+		`create_by`,
+		`create_date`,
+		`update_by`,
+		`update_date`,
+		`remarks`,
+		`del_flag`,
+		`food_status`,
+		`food_value`
+		)
+		values
+		(
+
+		#{createBy},
+		#{createDate},
+		#{updateBy},
+		#{updateDate},
+		#{remarks},
+		1,
+		#{foodStatus},
+		#{foodValue}
+		)
+	</insert>
+
+</mapper>

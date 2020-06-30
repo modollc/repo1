@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.dige.DigeDiningWriteDao">
+	<resultMap id="DigeDiningResult" type="com.djk.web.entity.dige.DigeDining">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="delFlag" column="del_flag" />
+			<result property="mealQuantity" column="meal_quantity" />
+			<result property="mealScope" column="meal_scope" />
+			<result property="mealValue" column="meal_value" />
+	</resultMap>
+	<select id="count" resultType="Integer">
+		select count(*) from `dige_dining`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.dige.DigeDining" resultMap="DigeDiningResult">
+		SELECT * from dige_dining
+		<include refid="whereConditions" />
+	</select>
+   <sql id="whereConditions">
+        <where>
+            del_flag=1
+            <if test="mealQuantity != null and mealQuantity != ''">
+                and 
+                (`meal_quantity` like CONCAT('%',#{mealQuantity},'%') or `meal_scope` like CONCAT('%',#{mealQuantity},'%')  or `meal_value` like CONCAT('%',#{mealQuantity},'%') or  `id` like CONCAT('%',#{mealQuantity},'%')  ) 
+            </if>
+        </where>
+    </sql>
+	<!--  <delete id="delete" parameterType="String">
+    delete from `dige_dining`
+		where `id` = #{id}
+    </delete> -->
+    <update id="delete" parameterType="String">
+    update `dige_dining` set del_flag=2
+		where `id` = #{id}
+    </update>
+    
+    
+	<select id="get" parameterType="Integer" resultMap="DigeDiningResult">
+		select
+		   *
+		from `dige_dining`
+		where `id` = #{id}
+	</select>
+	<select id="checkNameUnique" parameterType="String" resultMap="DigeDiningResult">
+		select
+		   *
+		from `dige_dining`
+		where `meal_quantity` = #{mealQuantity} and del_flag=1
+	</select>
+	<update id="update" parameterType="com.djk.web.entity.dige.DigeDining">
+        update `dige_dining` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="mealQuantity != null">`meal_quantity`= #{mealQuantity},</if>
+			<if test="mealScope != null">`meal_scope`= #{mealScope},</if>
+			<if test="mealValue != null">`meal_value`= #{mealValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.dige.DigeDining" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`dige_dining`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`del_flag`,
+			`meal_quantity`,
+			`meal_scope`,
+			`meal_value`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			1,
+			#{mealQuantity},
+			#{mealScope},
+			#{mealValue}
+		)
+	</insert>
+	
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.systemResource.SystemWeightWriteDao">
+	<resultMap id="SystemWeightResult" type="com.djk.web.entity.systemResource.SystemWeight">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="weightName" column="weight_name" />
+			<result property="weightNum" column="weight_num" />
+			<result property="weightValue" column="weight_value" />
+			<result property="delFlag" column="del_flag" />
+	</resultMap>
+	<sql id="whereConditions">
+        <where>
+            1=1
+            <if test="weightName != null and weightName != ''">
+                and 
+                (`weight_name` like CONCAT('%',#{weightName},'%') or `weight_num` like CONCAT('%',#{weightName},'%') or  `weight_value` like CONCAT('%',#{weightName},'%')  or  `id` like CONCAT('%',#{weightName},'%') )
+            </if>
+            and `del_flag` = 1
+        </where>
+    </sql>
+	<select id="get" parameterType="Integer" resultMap="SystemWeightResult">
+		select
+		   *
+		from `system_weight`
+		where `id` = #{id}
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.systemResource.SystemWeight">
+        update `system_weight` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="weightName != null">`weight_name`= #{weightName},</if>
+			<if test="weightNum != null">`weight_num`= #{weightNum},</if>
+			<if test="weightValue != null">`weight_value`= #{weightValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.systemResource.SystemWeight" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`system_weight`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`weight_name`,
+			`weight_num`,
+			`weight_value`,
+			`del_flag`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			#{weightName},
+			#{weightNum},
+			#{weightValue},
+			1
+		)
+	</insert>
+	<select id="count" resultType="Integer">
+		select count(*) from `system_weight`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.systemResource.SystemWeight" resultMap="SystemWeightResult">
+		SELECT * from system_weight
+		<include refid="whereConditions" />
+	</select>
+   
+    <!-- 逻辑删除 -->
+    <update id="delete" parameterType="Integer">
+        update `system_weight` 
+        set `del_flag` = 2 where `id` = #{id}
+	</update>
+    <select id="checkNameUnique" parameterType="String" resultMap="SystemWeightResult">
+		select
+		   *
+		from `system_weight`
+		where `weight_name` = #{weightName} and `del_flag` = 1
+	</select>
+</mapper>

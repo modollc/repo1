@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.food.FoodSeasonalWriteDao">
+	<resultMap id="FoodSeasonalResult" type="com.djk.web.entity.food.FoodSeasonal">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="delFlag" column="del_flag" />
+			<result property="seasonal" column="seasonal" />
+			<result property="seasonalValue" column="seasonal_value" />
+	</resultMap>
+	<select id="checkNameUnique" parameterType="String" resultMap="FoodSeasonalResult">
+		select
+		   *
+		from `food_seasonal`
+		where `seasonal` = #{seasonal} and del_flag=1
+	</select>
+	
+	
+	<select id="checkDelete" resultType="Integer">
+	    select count(*) from food where state=1 and season_name=#{seasonName}
+	</select>
+	
+	<select id="count" resultType="Integer">
+		select count(*) from `food_seasonal`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.food.FoodSeasonal" resultMap="FoodSeasonalResult">
+		SELECT * from food_seasonal
+		<include refid="whereConditions" />
+	</select>
+   <sql id="whereConditions">
+        <where>
+            del_flag=1
+            <if test="seasonal != null and seasonal != ''">
+                and 
+                (`seasonal` like CONCAT('%',#{seasonal},'%') or `seasonal_value` like CONCAT('%',#{seasonal},'%') or `id` like CONCAT('%',#{seasonal},'%') )
+            </if>
+        </where>
+    </sql>
+	
+	
+	 <!-- <delete id="delete" parameterType="String">
+    delete from `food_seasonal`
+		where `id` = #{id}
+    </delete> -->
+    <update id="delete" parameterType="String">
+        update `food_seasonal` set   del_flag=2
+		where `id` = #{id}
+    </update>
+	
+	<select id="get" parameterType="Integer" resultMap="FoodSeasonalResult">
+		select
+		   *
+		from `food_seasonal`
+		where `id` = #{id}
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.food.FoodSeasonal">
+        update `food_seasonal` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="seasonal != null">`seasonal`= #{seasonal},</if>
+			<if test="seasonalValue != null">`seasonal_value`= #{seasonalValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.food.FoodSeasonal" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`food_seasonal`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`del_flag`,
+			`seasonal`,
+			`seasonal_value`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			1,
+			#{seasonal},
+			#{seasonalValue}
+		)
+	</insert>
+	
+</mapper>

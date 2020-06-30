@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.role.RoleDaoWrite">
+	<resultMap id="sysRoleResult" type="com.djk.web.entity.role.SysRole">
+			<result property="id" column="id" />
+			<result property="name" column="roles_name" />
+	</resultMap>
+	
+	<select id="get" parameterType="Integer" resultMap="sysRoleResult">
+		select
+		   *
+		from `system_roles`
+		where `id` = #{id}
+	</select>
+	
+	<select id="getSysRoleListCount" parameterType="java.util.Map" resultType="Integer">
+		select
+		   count(*)
+		from system_roles a
+		<include refid="getCondition"/>
+	</select>
+	<select id="getSysRoleList" parameterType="java.util.Map" resultMap="sysRoleResult">
+		SELECT
+			a.*
+		FROM
+			system_roles a
+		<if test="size != null and size &gt; 0">limit #{start},#{size}</if>
+	</select>
+	
+	<sql id="getCondition">
+        <where>
+            <if test="queryMap.q_name != null and queryMap.q_name != ''">
+
+                and roles_name = #{queryMap.q_name}
+
+            </if>
+        </where>
+    </sql>
+    
+    	<insert id="insert" parameterType="com.djk.web.entity.role.SysRole" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`system_roles`
+		(
+			`roles_name`
+		)
+		values
+		(
+			#{name}
+		)
+	</insert>
+	
+	<update id="update" parameterType="com.djk.web.entity.role.SysRole">
+        update `system_roles` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="name != null">`roles_name`= #{name},</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	  <delete id="deleteById">
+		delete from system_roles where id = #{id}
+	</delete>
+</mapper>

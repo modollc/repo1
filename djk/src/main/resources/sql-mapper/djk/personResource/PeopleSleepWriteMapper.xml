@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.personResource.PeopleSleepWriteDao">
+	<resultMap id="PeopleSleepResult" type="com.djk.web.entity.personResource.PeopleSleep">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="sleepQuality" column="sleep_quality" />
+			<result property="sleepTime" column="sleep_time" />
+			<result property="sleepValue" column="sleep_value" />
+			<result property="delFlag" column="del_flag" />
+	</resultMap>
+	<sql id="whereConditions">
+        <where>
+            1=1
+            <if test="sleepQuality != null and sleepQuality != ''">
+                and 
+                (`sleep_quality` like CONCAT('%',#{sleepQuality},'%') or `sleep_time` like CONCAT('%',#{sleepQuality},'%') or `sleep_value` like CONCAT('%',#{sleepQuality},'%') or `id` like CONCAT('%',#{sleepQuality},'%')) 
+            </if>
+            and `del_flag` = 1
+        </where>
+    </sql>
+	<select id="get" parameterType="Integer" resultMap="PeopleSleepResult">
+		select
+		   *
+		from `people_sleep`
+		where `id` = #{id}
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.personResource.PeopleSleep">
+        update `people_sleep` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="sleepQuality != null">`sleep_quality`= #{sleepQuality},</if>
+			<if test="sleepTime != null">`sleep_time`= #{sleepTime},</if>
+			<if test="sleepValue != null">`sleep_value`= #{sleepValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.personResource.PeopleSleep" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`people_sleep`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`sleep_quality`,
+			`sleep_time`,
+			`sleep_value`,
+			`del_flag`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			#{sleepQuality},
+			#{sleepTime},
+			#{sleepValue},
+			1
+		)
+	</insert>
+	
+	<select id="count" resultType="Integer">
+		select count(*) from `people_sleep`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.personResource.PeopleSleep" resultMap="PeopleSleepResult">
+		SELECT * from people_sleep
+		<include refid="whereConditions" />
+	</select>
+
+    <!-- 逻辑删除 -->
+    <update id="delete" parameterType="Integer">
+        update `people_sleep` 
+        set `del_flag` = 2 where `id` = #{id}
+	</update>
+    <select id="checkNameUnique" parameterType="String" resultMap="PeopleSleepResult">
+		select
+		   *
+		from `people_sleep`
+		where `sleep_quality` = #{sleepQuantity} and `del_flag` = 1
+	</select>
+</mapper>

@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.food.FoodWriteDao">
+	<resultMap id="FoodResult" type="com.djk.web.entity.food.Food">
+			<result property="id" column="id" />
+			<result property="name" column="name" />
+			<result property="alias" column="alias" />
+			<result property="code" column="code" />
+			<result property="firstCategoryId" column="first_category_id" />
+			<result property="firstCategoryName" column="first_category_name" />
+			<result property="secondCategoryId" column="second_category_id" />
+			<result property="secondCategoryName" column="second_category_name" />
+			<result property="threeCategoryId" column="three_category_id" />
+			<result property="threeCategoryName" column="three_category_name" />
+			<result property="firstOriginId" column="first_origin_id" />
+			<result property="firstOriginName" column="first_origin_name" />
+			<result property="secondOriginId" column="second_origin_id" />
+			<result property="secondOriginName" column="second_origin_name" />
+			<result property="threeOriginId" column="three_origin_id" />
+			<result property="threeOriginName" column="three_origin_name" />
+			<result property="seasonId" column="season_id" />
+			<result property="seasonName" column="season_name" />
+			<result property="supplierId" column="supplier_id" />
+			<result property="supplierName" column="supplier_name" />
+			<result property="unitId" column="unit_id" />
+			<result property="unitName" column="unit_name" />
+			<result property="unitNum" column="unit_num" />
+			<result property="state" column="state" />
+			<result property="codeValue" column="code_value" />
+			<result property="publicCategoryNames" column="publicCategoryNames" />
+	</resultMap>
+	
+	<resultMap id="NutritionComponentResult"  type="com.djk.web.entity.nutrition.NutritionComponent">
+			<result property="id" column="id" />
+			<result property="name" column="name" />
+			<result property="unit" column="unit" />
+			<result property="nutritionCategoryId" column="nutrition_category_id" />
+			<result property="nutritionCategoryName" column="nutrition_category_name" />
+			<result property="nutritionCategoryCode" column="nutrition_category_code" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="state" column="state" />
+			<result property="pids" column="pids" />
+	</resultMap>
+	
+	<resultMap id="FoodNutritionComponentResult"  type="com.djk.web.entity.food.FoodNutritionComponent">
+			<result property="id" column="id" />
+			<result property="nutrition_component_name" column="nutritionComponentName" />
+			<result property="nutrition_component_unit" column="nutritionComponentUnit" />
+			<result property="nutrition_component_num" column="nutritionComponentNum" />
+			<result property="food_id" column="foodId" />
+			<result property="state" column="state" />
+	</resultMap>
+	
+	<resultMap id="FoodPublicCategoryCheckResult" type="com.djk.web.entity.food.FoodPublicCategoryCheck">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="pid" column="pid" />
+			<result property="name" column="name" />
+			<result property="foodCategoryId" column="food_category_id" />
+			<result property="state" column="state" />
+			<result property="check" column="check" />
+			<result property="foodId" column="food_id" />
+			<result property="oldId" column="old_id" />
+	</resultMap>
+	
+	<resultMap id="SystemWeightResult" type="com.djk.web.entity.systemResource.SystemWeight">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="weightName" column="weight_name" />
+			<result property="weightNum" column="weight_num" />
+			<result property="weightValue" column="weight_value" />
+	</resultMap>
+	
+	<select id="queryCodeMax" parameterType="Integer" resultType="Integer">
+		select max(code) from food where first_category_id=#{foodCategoryId};
+	</select>
+	
+	<select id="findSystemWeightList" resultMap="SystemWeightResult" parameterType="Integer">
+		select * from `system_weight`
+	</select>
+	
+	<select id="getFoodNutritionComponentList" resultMap="FoodNutritionComponentResult" parameterType="Integer">
+		select id, nutrition_component_name, nutrition_component_unit, nutrition_component_num, food_id, state from `food_nutrition_component` 
+		where food_id=#{foodId} and `state` = 1
+		UNION all
+		select id, name nutrition_component_name, unit nutrition_component_unit, '' nutrition_component_num, #{foodId} food_id, 1 state from nutrition_component nc 
+		where nc.name not in(select nutrition_component_name from `food_nutrition_component` where food_id=#{foodId} and `state` = 1)
+	</select>
+	
+	<select id="getNutritionComponentList" resultMap="NutritionComponentResult" parameterType="Integer">
+		select * from nutrition_component nc 
+		where nc.name not in(select nutrition_component_name from `food_nutrition_component` where food_id=#{foodId} and `state` = 1)
+	</select>
+	
+	<select id="findPublicCategoryCheck" resultType="Integer" parameterType="Integer">
+		select old_id from `food_public_category_check` where food_id=#{foodId} and `check` = 1
+	</select>
+	
+	<select id="validateFoodNameExist" resultType="Integer" parameterType="String">
+		select count(*) from `food` where `state` = 1 and `name` = #{name}
+	</select>
+	
+	<select id="count" resultType="Integer">
+		select count(*) from `food`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.food.Food" resultMap="FoodResult">
+		SELECT f.*,
+		(SELECT  group_concat(name) from food_public_category_check where food_category_id=#{firstCategoryId} and food_id=f.id and `check`=1) publicCategoryNames
+		 from food f
+		<include refid="whereConditions" />
+	</select>
+	
+	<sql id="whereConditions">
+        <where>
+            state = 1
+            <if test="name != null and name != ''">
+                and (`name` like CONCAT('%',#{name},'%') or `code_value` like CONCAT('%',#{name},'%') or `alias` like CONCAT('%',#{name},'%'))
+            </if>
+             <if test="firstCategoryId != null and firstCategoryId != ''">
+                and first_category_id = #{firstCategoryId} 
+            </if>
+            order by id desc
+        </where>
+    </sql>
+	
+	<insert id="insertFoodNutritionComponent" parameterType="com.djk.web.entity.food.FoodNutritionComponent" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`food_nutrition_component`
+		(
+			`nutrition_component_name`,
+			`nutrition_component_unit`,
+			`nutrition_component_num`,
+			`food_id`,
+			`state`
+		)
+		values
+		(
+			#{nutritionComponentName},
+			#{nutritionComponentUnit},
+			#{nutritionComponentNum},
+			#{foodId},
+			#{state}
+		)
+	</insert>
+	
+	<insert id="insertPublicFoodCategoryCheck" parameterType="com.djk.web.entity.food.FoodPublicCategoryCheck" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`food_public_category_check`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`pid`,
+			`name`,
+			`food_category_id`,
+			`state`,
+			`check`,
+			`food_id`,
+			`old_id`
+		)
+		values
+		(
+			
+			#{createBy},
+			now(),
+			#{updateBy},
+			#{updateDate},
+			#{pid},
+			#{name},
+			#{foodCategoryId},
+			#{state},
+			#{check},
+			#{foodId},
+			#{oldId}
+		)
+	</insert>
+	
+	<update id="delete" parameterType="Integer" >
+        update `food` set `state`= 2
+        where `id` = #{id}
+	</update>
+	
+	<update id="updatePublicFoodCategoryCheck" parameterType="com.djk.web.entity.food.FoodPublicCategoryCheck">
+        update `food_public_category_check` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			`update_date`= now(),
+			<if test="pid != null">`pid`= #{pid},</if>
+			<if test="name != null">`name`= #{name},</if>
+			<if test="foodCategoryId != null">`food_category_id`= #{foodCategoryId},</if>
+			<if test="state != null">`state`= #{state},</if>
+			<if test="check != null">`check`= #{check}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<select id="get" parameterType="Integer" resultMap="FoodResult">
+		select
+		   *
+		from `food`
+		where `id` = #{id}
+	</select>
+	
+	<select id="foodListByGategoryId" parameterType="Integer" resultMap="FoodResult">
+		select * from `food` 
+		where `first_category_id` = #{foodCategoryId}
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.food.Food">
+        update `food` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="name != null">`name`= #{name},</if>
+			<if test="alias != null">`alias`= #{alias},</if>
+			<if test="code != null">`code`= #{code},</if>
+			<if test="firstCategoryId != null">`first_category_id`= #{firstCategoryId},</if>
+			<if test="firstCategoryName != null">`first_category_name`= #{firstCategoryName},</if>
+			<if test="secondCategoryId != null">`second_category_id`= #{secondCategoryId},</if>
+			<if test="secondCategoryName != null">`second_category_name`= #{secondCategoryName},</if>
+			<if test="threeCategoryId != null">`three_category_id`= #{threeCategoryId},</if>
+			<if test="threeCategoryName != null">`three_category_name`= #{threeCategoryName},</if>
+			<if test="firstOriginId != null">`first_origin_id`= #{firstOriginId},</if>
+			<if test="firstOriginName != null">`first_origin_name`= #{firstOriginName},</if>
+			<if test="secondOriginId != null">`second_origin_id`= #{secondOriginId},</if>
+			<if test="secondOriginName != null">`second_origin_name`= #{secondOriginName},</if>
+			<if test="threeOriginId != null">`three_origin_id`= #{threeOriginId},</if>
+			<if test="threeOriginName != null">`three_origin_name`= #{threeOriginName},</if>
+			<if test="seasonId != null">`season_id`= #{seasonId},</if>
+			<if test="seasonName != null">`season_name`= #{seasonName},</if>
+			<if test="supplierId != null">`supplier_id`= #{supplierId},</if>
+			<if test="supplierName != null">`supplier_name`= #{supplierName},</if>
+			<if test="unitId != null">`unit_id`= #{unitId},</if>
+			<if test="unitName != null">`unit_name`= #{unitName},</if>
+			<if test="unitNum != null">`unit_num`= #{unitNum},</if>
+			<if test="state != null">`state`= #{state}</if>,
+			<if test="codeValue != null">`code_value`= #{codeValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.food.Food" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`food`
+		(
+			
+			`name`,
+			`alias`,
+			`code`,
+			`first_category_id`,
+			`first_category_name`,
+			`second_category_id`,
+			`second_category_name`,
+			`three_category_id`,
+			`three_category_name`,
+			`first_origin_id`,
+			`first_origin_name`,
+			`second_origin_id`,
+			`second_origin_name`,
+			`three_origin_id`,
+			`three_origin_name`,
+			`season_id`,
+			`season_name`,
+			`supplier_id`,
+			`supplier_name`,
+			`unit_id`,
+			`unit_name`,
+			`unit_num`,
+			`state`,
+			`code_value`
+		)
+		values
+		(
+			
+			#{name},
+			#{alias},
+			#{code},
+			#{firstCategoryId},
+			#{firstCategoryName},
+			#{secondCategoryId},
+			#{secondCategoryName},
+			#{threeCategoryId},
+			#{threeCategoryName},
+			#{firstOriginId},
+			#{firstOriginName},
+			#{secondOriginId},
+			#{secondOriginName},
+			#{threeOriginId},
+			#{threeOriginName},
+			#{seasonId},
+			#{seasonName},
+			#{supplierId},
+			#{supplierName},
+			#{unitId},
+			#{unitName},
+			#{unitNum},
+			#{state},
+			#{codeValue}
+		)
+	</insert>
+	
+	
+	
+	
+	<select id="getComponentList" resultMap="NutritionComponentResult">
+		select name, unit from nutrition_component GROUP BY name,unit
+	</select>
+	
+	 <delete id="deletePublicFoodCategoryCheck" parameterType="Integer">
+    	delete from `food_public_category_check`
+		where `food_id` = #{foodId}
+    </delete>
+    
+     <delete id="deleteFoodNutritionComponent" parameterType="Integer">
+    	delete from `food_nutrition_component`
+		where `food_id` = #{foodId}
+    </delete>
+    
+    <resultMap id="nameResult" type="String">
+			<result property="name" column="name" />
+	</resultMap>
+    
+    <select id="getFoodListByName" parameterType="java.lang.String" resultMap="nameResult">
+		select name
+		from `food`
+		where name like CONCAT(CONCAT('%',#{name}),'%') and `state` = 1
+	</select>
+	
+    <select id="getPublicCategoryCheckList" parameterType="java.lang.Integer" resultMap="FoodPublicCategoryCheckResult">
+		select *
+		from `food_public_category_check`
+		where food_id = #{foodId} and `state` = 1
+	</select>
+    
+</mapper>

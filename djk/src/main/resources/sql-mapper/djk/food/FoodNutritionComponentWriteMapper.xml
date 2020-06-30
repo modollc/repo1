@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.food.FoodNutritionComponentWriteDao">
+	<resultMap id="FoodNutritionComponentResult" type="com.djk.web.entity.food.FoodNutritionComponent">
+			<result property="id" column="id" />
+			<result property="nutritionComponentName" column="nutrition_component_name" />
+			<result property="nutritionComponentUnit" column="nutrition_component_unit" />
+			<result property="nutritionComponentNum" column="nutrition_component_num" />
+			<result property="foodId" column="food_id" />
+			<result property="state" column="state" />
+	</resultMap>
+	
+	<select id="get" parameterType="Integer" resultMap="FoodNutritionComponentResult">
+		select
+		   *
+		from `food_nutrition_component`
+	</select>
+	
+	
+</mapper>

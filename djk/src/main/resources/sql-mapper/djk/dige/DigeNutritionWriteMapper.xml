@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.dige.DigeNutritionWriteDao">
+	<resultMap id="DigeNutritionResult" type="com.djk.web.entity.dige.DigeNutrition">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="delFlag" column="del_flag" />
+			<result property="nutritionQuantity" column="nutrition_quantity" />
+			<result property="nutritionNumber" column="nutrition_number" />
+			<result property="nutritionValue" column="nutrition_value" />
+	</resultMap>
+	
+	
+	<select id="count" resultType="Integer">
+		select count(*) from `dige_nutrition`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.dige.DigeNutrition" resultMap="DigeNutritionResult">
+		SELECT * from dige_nutrition
+		<include refid="whereConditions" />
+	</select>
+   <sql id="whereConditions">
+        <where>
+            del_flag=1
+            <if test="nutritionQuantity != null and nutritionQuantity != ''">
+                and 
+                (`nutrition_quantity` like CONCAT('%',#{nutritionQuantity},'%') or `nutrition_number` like CONCAT('%',#{nutritionQuantity},'%') or `nutrition_value` like CONCAT('%',#{nutritionQuantity},'%') or `id` like CONCAT('%',#{nutritionQuantity},'%') )
+            </if>
+        </where>
+    </sql>
+	<!--  <delete id="delete" parameterType="String">
+    delete from `dige_nutrition`
+		where `id` = #{id}
+    </delete> -->
+	
+	<update id="delete" parameterType="String">
+	update `dige_nutrition` set del_flag=2
+		where `id` = #{id}
+	
+	</update>
+	<select id="get" parameterType="Integer" resultMap="DigeNutritionResult">
+		select
+		   *
+		from `dige_nutrition`
+		where `id` = #{id}
+	</select>
+		<select id="checkNameUnique" parameterType="String" resultMap="DigeNutritionResult">
+		select
+		   *
+		from `dige_nutrition`
+		where `nutrition_quantity` = #{nutritionQuantity} and  del_flag=1
+	</select>
+	<update id="update" parameterType="com.djk.web.entity.dige.DigeNutrition">
+        update `dige_nutrition` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="nutritionQuantity != null">`nutrition_quantity`= #{nutritionQuantity},</if>
+			<if test="nutritionNumber != null">`nutrition_number`= #{nutritionNumber},</if>
+			<if test="nutritionValue != null">`nutrition_value`= #{nutritionValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.dige.DigeNutrition" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`dige_nutrition`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`del_flag`,
+			`nutrition_quantity`,
+			`nutrition_number`,
+			`nutrition_value`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			1,
+			#{nutritionQuantity},
+			#{nutritionNumber},
+			#{nutritionValue}
+		)
+	</insert>
+	
+</mapper>

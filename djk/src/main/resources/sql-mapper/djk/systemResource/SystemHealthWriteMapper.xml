@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.systemResource.SystemHealthWriteDao">
+	<resultMap id="SystemHealthResult" type="com.djk.web.entity.systemResource.SystemHealth">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="healthName" column="health_name" />
+			<result property="healthValue" column="health_value" />
+			<result property="delFlag" column="del_flag" />
+	</resultMap>
+	 <sql id="whereConditions">
+        <where>
+            1=1
+            <if test="healthName != null and healthName != ''">
+                and 
+                (`health_name` like CONCAT('%',#{healthName},'%')  or `health_value` like CONCAT('%',#{healthName},'%') or  `id` like CONCAT('%',#{healthName},'%') )
+            </if> 
+            and `del_flag` = 1
+        </where>
+    </sql>
+	<select id="get" parameterType="Integer" resultMap="SystemHealthResult">
+		select
+		   *
+		from `system_health`
+		where `id` = #{id}
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.systemResource.SystemHealth">
+        update `system_health` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="healthName != null">`health_name`= #{healthName},</if>
+			<if test="healthValue != null">`health_value`= #{healthValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.systemResource.SystemHealth" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`system_health`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`health_name`,
+			`health_value`,
+			`del_flag`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			#{healthName},
+			#{healthValue},
+			1
+		)
+	</insert>
+	<select id="count" resultType="Integer">
+		select count(*) from `system_health`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.systemResource.SystemHealth" resultMap="SystemHealthResult">
+		SELECT * from system_health
+		<include refid="whereConditions" />
+	</select>
+  
+     <!-- 逻辑删除 -->
+    <update id="delete" parameterType="Integer">
+        update `system_health` 
+        set `del_flag` = 2 where `id` = #{id}
+	</update>
+    <select id="checkNameUnique" parameterType="String" resultMap="SystemHealthResult">
+		select
+		   *
+		from `system_health`
+		where `health_name` = #{healthName} and `del_flag` = 1
+	</select>
+</mapper>

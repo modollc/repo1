@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.systemResource.SystemConstantWriteDao">
+	<resultMap id="SystemConstantResult" type="com.djk.web.entity.systemResource.SystemConstant">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="constantName" column="constant_name" />
+			<result property="minValue" column="min_value" />
+			<result property="maxValue" column="max_value" />
+			<result property="constantValue" column="constant_value" />
+			<result property="delFlag" column="del_flag" />
+	</resultMap>
+	<sql id="whereConditions">
+        <where>
+            1=1
+            <if test="constantName != null and constantName != ''">
+                and 
+                (`constant_name` like CONCAT('%',#{constantName},'%') or `constant_value` like CONCAT('%',#{constantName},'%')or `min_value` like CONCAT('%',#{constantName},'%')or `max_value` like CONCAT('%',#{constantName},'%')or `id` like CONCAT('%',#{constantName},'%')) 
+            </if>
+            and `del_flag` = 1
+        </where>
+    </sql>
+	<select id="get" parameterType="Integer" resultMap="SystemConstantResult">
+		select
+		   *
+		from `system_constant`
+		where `id` = #{id}
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.systemResource.SystemConstant">
+        update `system_constant` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="constantName != null">`constant_name`= #{constantName},</if>
+			<if test="minValue != null">`min_value`= #{minValue},</if>
+			<if test="maxValue != null">`max_value`= #{maxValue},</if>
+			<if test="constantValue != null">`constant_value`= #{constantValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.systemResource.SystemConstant" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`system_constant`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`constant_name`,
+			`min_value`,
+			`max_value`,
+			`constant_value`,
+			`del_flag`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			#{constantName},
+			#{minValue},
+			#{maxValue},
+			#{constantValue},
+			1
+		)
+	</insert>
+	<select id="count" resultType="Integer">
+		select count(*) from `system_constant`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.systemResource.SystemConstant" resultMap="SystemConstantResult">
+		SELECT * from system_constant
+		<include refid="whereConditions" />
+	</select>
+
+    <!-- 逻辑删除 -->
+    <update id="delete" parameterType="Integer">
+        update `system_constant` 
+        set `del_flag` = 2 where `id` = #{id}
+	</update>
+     <select id="checkNameUnique" parameterType="String" resultMap="SystemConstantResult">
+		select
+		   *
+		from `system_constant`
+		where `constant_name` = #{constantName} and `del_flag` = 1
+	</select>
+</mapper>

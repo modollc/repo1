@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.food.FoodOriginWriteDao">
+	<resultMap id="FoodOriginResult" type="com.djk.web.entity.food.FoodOrigin">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="delFlag" column="del_flag" />
+			<result property="originName" column="origin_name" />
+			<result property="parentId" column="parent_id" />
+	</resultMap>
+	<select  id="checkDelete" resultType="Integer">
+	 select count(*) from food 
+     where first_origin_name=#{originName} or second_origin_name=#{originName} or three_origin_name=#{originName}
+     and state=1
+	</select>
+	<select id="checkNameUnique" parameterType="String" resultMap="FoodOriginResult">
+		select
+		   *
+		from `food_origin`
+		where `origin_name` = #{originName} and del_flag=1
+	</select>
+	<select id="count" resultType="Integer">
+		select count(*) from `food_origin`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.food.FoodOrigin" resultMap="FoodOriginResult">
+		SELECT * from food_origin
+		<include refid="whereConditions" />
+	</select>
+	
+	<select id="findListByPId" parameterType="Integer" resultMap="FoodOriginResult">
+		SELECT * from food_origin where 1=1 and `parent_id` = #{parentId}
+	</select>
+	
+   <sql id="whereConditions">
+        <where>
+            del_flag=1
+            <if test="originName != null and originName != ''">
+                and `origin_name` like CONCAT('%',#{originName},'%') 
+            </if>
+        </where>
+    </sql>
+<!-- 	 <delete id="delete" parameterType="String">
+    delete from `food_origin`
+		where `id` = #{id}
+    </delete> -->
+	
+	<update id="delete" parameterType="String">
+	   update `food_origin` set  del_flag=2
+		where `id` = #{id}
+	</update>
+	
+	<select id="get" parameterType="Integer" resultMap="FoodOriginResult">
+		select
+		   *
+		from `food_origin`
+		where `id` = #{id}
+	</select>
+		<select id="getName" parameterType="String" resultMap="FoodOriginResult">
+		select
+		   *
+		from `food_origin` 
+		where `origin_name` = #{originName} and del_flag=1
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.food.FoodOrigin">
+        update `food_origin` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="originName != null">`origin_name`= #{originName},</if>
+			<if test="parentId != null">`parent_id`= #{parentId}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.food.FoodOrigin" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`food_origin`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`del_flag`,
+			`origin_name`,
+			`parent_id`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			1,
+			#{originName},
+			#{parentId}
+		)
+	</insert>
+	
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.food.FoodCookingWriteDao">
+	<resultMap id="FoodCookingResult" type="com.djk.web.entity.food.FoodCooking">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="delFlag" column="del_flag" />
+			<result property="cookingMethod" column="cooking_method" />
+			<result property="cookingValue" column="cooking_value" />
+	</resultMap>
+	
+	<select id="count" resultType="Integer">
+		select count(*) from `food_cooking`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.food.FoodCooking" resultMap="FoodCookingResult">
+		SELECT * from food_cooking
+		<include refid="whereConditions" />
+	</select>
+   <sql id="whereConditions">
+        <where>
+            del_flag=1
+            <if test="cookingMethod != null and cookingMethod != ''">
+               and
+                (`cooking_method` like CONCAT('%',#{cookingMethod},'%') or `cooking_value` like CONCAT('%',#{cookingMethod},'%') or `id` like CONCAT('%',#{cookingMethod},'%') )
+            </if>
+        </where>
+    </sql>
+	<!--  <delete id="delete" parameterType="String">
+    delete from `food_cooking`
+		where `id` = #{id}
+    </delete> -->
+	<update id="delete" parameterType="String">
+	update `food_cooking` set   del_flag=2
+		where `id` = #{id}
+	</update>
+	
+	<select id="checkNameUnique" parameterType="String" resultMap="FoodCookingResult">
+		select
+		   *
+		from `food_cooking`
+		where `cooking_method` = #{cookingMethod} and  del_flag=1
+	</select>
+	
+	<select id="get" parameterType="Integer" resultMap="FoodCookingResult">
+		select
+		   *
+		from `food_cooking`
+		where `id` = #{id}
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.food.FoodCooking">
+        update `food_cooking` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="cookingMethod != null">`cooking_method`= #{cookingMethod},</if>
+			<if test="cookingValue != null">`cooking_value`= #{cookingValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.food.FoodCooking" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`food_cooking`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`del_flag`,
+			`cooking_method`,
+			`cooking_value`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			1,
+			#{cookingMethod},
+			#{cookingValue}
+		)
+	</insert>
+	
+</mapper>

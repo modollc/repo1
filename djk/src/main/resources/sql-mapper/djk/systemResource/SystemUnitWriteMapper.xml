@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.djk.web.dao.systemResource.SystemUnitWriteDao">
+	<resultMap id="SystemUnitResult" type="com.djk.web.entity.systemResource.SystemUnit">
+			<result property="id" column="id" />
+			<result property="createBy" column="create_by" />
+			<result property="createDate" column="create_date" />
+			<result property="updateBy" column="update_by" />
+			<result property="updateDate" column="update_date" />
+			<result property="remarks" column="remarks" />
+			<result property="unitName" column="unit_name" />
+			<result property="unitNum" column="unit_num" />
+			<result property="unitValue" column="unit_value" />
+			<result property="delFlag" column="del_flag" />
+	</resultMap>
+	  <sql id="whereConditions">
+        <where>
+            1=1
+            <if test="unitName != null and unitName != ''">
+                and 
+                (`unit_name` like CONCAT('%',#{unitName},'%') or `unit_num` like CONCAT('%',#{unitName},'%') or `unit_value` like CONCAT('%',#{unitName},'%') or `id` like CONCAT('%',#{unitName},'%') )
+            </if>
+            and `del_flag` = 1
+        </where>
+    </sql>
+	<select id="get" parameterType="Integer" resultMap="SystemUnitResult">
+		select
+		   *
+		from `system_unit`
+		where `id` = #{id}
+	</select>
+	
+	<update id="update" parameterType="com.djk.web.entity.systemResource.SystemUnit">
+        update `system_unit` 
+    	<set>
+			<if test="id != null">`id`= #{id},</if>
+			<if test="createBy != null">`create_by`= #{createBy},</if>
+			<if test="createDate != null">`create_date`= #{createDate},</if>
+			<if test="updateBy != null">`update_by`= #{updateBy},</if>
+			<if test="updateDate != null">`update_date`= #{updateDate},</if>
+			<if test="remarks != null">`remarks`= #{remarks},</if>
+			<if test="unitName != null">`unit_name`= #{unitName},</if>
+			<if test="unitNum != null">`unit_num`= #{unitNum},</if>
+			<if test="unitValue != null">`unit_value`= #{unitValue}</if>
+	    </set>
+        where `id` = #{id}
+	</update>
+	
+	<insert id="insert" parameterType="com.djk.web.entity.systemResource.SystemUnit" useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into 
+		`system_unit`
+		(
+			
+			`create_by`,
+			`create_date`,
+			`update_by`,
+			`update_date`,
+			`remarks`,
+			`unit_name`,
+			`unit_num`,
+			`unit_value`,
+			`del_flag`
+		)
+		values
+		(
+			
+			#{createBy},
+			#{createDate},
+			#{updateBy},
+			#{updateDate},
+			#{remarks},
+			#{unitName},
+			#{unitNum},
+			#{unitValue},
+			1
+		)
+	</insert>
+	<select id="count" resultType="Integer">
+		select count(*) from `system_unit`
+		 <include refid="whereConditions" /> 
+	</select>
+
+	<select id="findList" parameterType="com.djk.web.entity.systemResource.SystemUnit" resultMap="SystemUnitResult">
+		SELECT * from system_unit
+		<include refid="whereConditions" />
+	</select>
+ 
+    <!-- 逻辑删除 -->
+    <update id="delete" parameterType="Integer">
+        update `system_unit` 
+        set `del_flag` = 2 where `id` = #{id}
+	</update>
+    <select id="checkNameUnique" parameterType="String" resultMap="SystemUnitResult">
+		select
+		   *
+		from `system_unit`
+		where `unit_name` = #{unitName} and `del_flag` = 1
+	</select>
+
+	<!--查看被删除的体积单位是否在食物表中使用 -->
+    <select id="isUsedInFood"  resultType="Integer">
+		select COUNT(*) from food where unit_id = #{id} and state = 1
+	</select>
+</mapper>
