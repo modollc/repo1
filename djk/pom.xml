@@ -13,6 +13,7 @@
 		<relativePath>parent-pom.xml</relativePath>
 	</parent>
 
+
 	<artifactId>djk</artifactId>
 	<packaging>war</packaging>
 
